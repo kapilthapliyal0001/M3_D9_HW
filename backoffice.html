@@ -81,9 +81,9 @@
 
             <!-- Product Price -->
             <div class="form-group">
-              <label for="brand">Brand</label>
+              <label for="price">Price</label>
               <input
-                id="brand"
+                id="price"
                 type="text"
                 class="form-control"
                 aria-describedby="price"
@@ -96,6 +96,75 @@
         </div>
       </div>
     </div>
+
+    <!-- HomePage link -->
+    <div class="backoffice d-flex justify-content-between container mt-4">
+      <h2>Go to the homepage and see items</h2>
+      <a href="./home.html"
+        ><button type="button" class="btn btn-success">Go!</button></a
+      >
+    </div>
+
+    <script>
+      // AMAZON backoffice JS starts;
+
+      // handle submit function whenever the form is being submitted;
+
+      const handleSubmit = async (event) => {
+        const url = "https://striveschool-api.herokuapp.com/api/product/";
+        event.preventDefault();
+
+        const name = document.getElementById("name").value;
+        console.log("till name is perfect", name);
+
+        const myEvent = {
+          name,
+          description: document.getElementById("description").value,
+          brand: document.getElementById("brand").value,
+          imageUrl: document.getElementById("url").value,
+          price: document.getElementById("price").value,
+        };
+
+        // console.log(event);
+
+        //  time for some POST;
+
+        try {
+          const response = await fetch(url, {
+            method: "POST", // method is POST as we want to post the data;
+            body: JSON.stringify(myEvent), // object is stringified;
+            headers: {
+              // headers is the info about the doctype;
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGFmODNiYmJlOWIxNTAwMTU1MDZlMTgiLCJpYXQiOjE2MjIxMTUyNTksImV4cCI6MTYyMzMyNDg1OX0.PEsg5k23MES6HUlKFUsFwhpH7JnT1QiAZe3WzAQLyJQ",
+              "Content-Type": "application/json",
+            },
+          });
+
+          console.log("Lets see the response: ", response);
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log("The data is: ", data);
+            alert(
+              `The product has been successfully added ! with the id: ${data._id}`
+            );
+          } else {
+            // codes for the error in case there is some error;
+            // if (response.status === 400) {
+            //   throw new Error("Bad request with status 400");
+            // } else if (response.status === 401) {
+            //   throw new Error("Anauthorized with status 401");
+            // } else if (response.status === 404) {
+            //   throw new Error("Not found with status 404");
+            // }
+            console.log("Nothing in the else");
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+    </script>
 
     <!-- Optional JavaScript; choose one of the two! -->
 

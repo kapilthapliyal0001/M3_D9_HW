@@ -13,7 +13,16 @@
       crossorigin="anonymous"
     />
 
-    <style></style>
+    <style>
+      body {
+        background: rgb(21, 66, 66);
+        background: linear-gradient(
+          9deg,
+          rgba(21, 66, 66, 1) 12%,
+          rgba(55, 135, 135, 1) 77%
+        );
+      }
+    </style>
 
     <title>HW - 9</title>
   </head>
@@ -34,8 +43,61 @@
     <!-- Current Products tiles  -->
 
     <div class="products container">
-      <div class="row justify-content-center"></div>
+      <div class="row justify-content-center" id="tile-row"></div>
     </div>
+
+    <!-- Products tiles ENDED -->
+
+    <!-- Backoffice link -->
+    <div class="backoffice d-flex justify-content-between container mt-4">
+      <h2>Go to the backoffice to add items</h2>
+      <a href="./backoffice.html"
+        ><button type="button" class="btn btn-success">Go!</button></a
+      >
+    </div>
+
+    <!-- JAVASCRIPT CODE FOR THE STRIVE AMAZON  -->
+
+    <script>
+      // adding the window onload features;
+
+      window.onload = async function () {
+        const url = "https://striveschool-api.herokuapp.com/api/product/";
+        const tileRow = document.getElementById("tile-row");
+
+        // fetching the data from the API;
+        try {
+          const response = await fetch(url, {
+            method: "GET", // method is POST as we want to post the data;
+            headers: {
+              // headers is the info about the doctype;
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGFmODNiYmJlOWIxNTAwMTU1MDZlMTgiLCJpYXQiOjE2MjIxMTUyNTksImV4cCI6MTYyMzMyNDg1OX0.PEsg5k23MES6HUlKFUsFwhpH7JnT1QiAZe3WzAQLyJQ",
+            },
+          });
+          const data = await response.json();
+          console.log(data);
+          renderImgs(data);
+        } catch (error) {}
+      };
+
+      const tileRow = document.getElementById("tile-row");
+
+      // render images for the images to show;
+      const renderImgs = (dataObj) => {
+        dataObj.forEach((data) => {
+          tileRow.innerHTML += `<div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="card img-fluid" style="width: 18rem;">
+                                        <img src="${data.imageUrl}" class="card-img-top img-fluid" alt="">
+                                        <div class="card-body">
+                                        <p class="card-text">${data.description}</p>
+                                        <a href="./backoffice.html?productId=${data._id}"> Do Product Changes</a>
+                                        </div>
+                                    </div>
+                                </div>`;
+        });
+      };
+    </script>
 
     <!-- Optional JavaScript; choose one of the two! -->
 
