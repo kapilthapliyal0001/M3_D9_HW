@@ -28,7 +28,7 @@
     </nav>
 
     <div class="container my-4">
-      <h2 class="text-center my-3">AMAZON BACKOFFICE</h2>
+      <h2 class="text-center my-3" id="heading">AMAZON BACKOFFICE</h2>
       <div class="row justify-content-center">
         <div class="col-md-6">
           <!-- FORM STARTS  -->
@@ -98,15 +98,22 @@
     </div>
 
     <!-- HomePage link -->
-    <div class="backoffice d-flex justify-content-between container mt-4">
-      <h2>Go to the homepage and see items</h2>
-      <a href="./home.html"
+    <div
+      class="backoffice d-flex justify-content-between container mt-4"
+      id="edit"
+    >
+      <h2 class="mt-3">Go to the homepage and see items</h2>
+      <a class="mt-3" href="./home.html"
         ><button type="button" class="btn btn-success">Go!</button></a
       >
     </div>
 
+    <!-- AMAZON backoffice JS starts; -->
+
     <script>
-      // AMAZON backoffice JS starts;
+      let idPresent = 0;
+      const urlParams = new URLSearchParams(window.location.search); // ?eventId=1289391872398123
+      let eventId = urlParams.get("productId");
 
       // handle submit function whenever the form is being submitted;
 
@@ -125,9 +132,7 @@
           price: document.getElementById("price").value,
         };
 
-        // console.log(event);
-
-        //  time for some POST;
+        //  time for some POST when the user pushes some data in the product page;
 
         try {
           const response = await fetch(url, {
@@ -149,23 +154,117 @@
             alert(
               `The product has been successfully added ! with the id: ${data._id}`
             );
-          } else {
-            // codes for the error in case there is some error;
-            // if (response.status === 400) {
-            //   throw new Error("Bad request with status 400");
-            // } else if (response.status === 401) {
-            //   throw new Error("Anauthorized with status 401");
-            // } else if (response.status === 404) {
-            //   throw new Error("Not found with status 404");
-            // }
-            console.log("Nothing in the else");
           }
         } catch (error) {
           alert(error.message);
         }
       };
-    </script>
 
+      // if we got the page from the homepage product clicks;
+
+      if (eventId) {
+        idPresent = 1;
+        const editButton = document.getElementById("edit");
+        const updateBtn = document.createElement("div");
+        updateBtn.innerHTML = `<button type="button" class="btn btn-danger ml-4 my-3" onclick="deleteData()">Delete</button>
+                                  <button type="button" class="btn btn-dark mt-3" onclick="editData()">Edit</button><br>`;
+
+        editButton.appendChild(updateBtn);
+
+        document.getElementById(
+          "heading"
+        ).innerText = `EDIT / DELETE the Product id:${eventId}`;
+
+        // 1. Fetching the data by GET method from the given ID:
+
+        const url = `https://striveschool-api.herokuapp.com/api/product/${eventId}`;
+        // console.log(url);
+        const response = fetch(url, {
+          method: "GET", // method is POST as we want to post the data;
+          headers: {
+            // headers is the info about the doctype;
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGFmODNiYmJlOWIxNTAwMTU1MDZlMTgiLCJpYXQiOjE2MjIxMTUyNTksImV4cCI6MTYyMzMyNDg1OX0.PEsg5k23MES6HUlKFUsFwhpH7JnT1QiAZe3WzAQLyJQ",
+            "Content-Type": "application/json",
+          },
+        })
+          .then((data) => data.json())
+          .then((file) => {
+            console.log(file);
+
+            document.getElementById("name").value = file.name;
+            document.getElementById("description").value = file.description;
+            document.getElementById("brand").value = file.brand;
+            document.getElementById("url").value = file.imageUrl;
+            document.getElementById("price").value = file.price;
+          });
+
+        console.log("Till here it done!");
+      }
+
+      // delete data function which removes the data using
+      // DELETE method of the fetch API
+      const deleteData = () => {
+        console.log("Till here it's fine");
+        fetch(`https://striveschool-api.herokuapp.com/api/product/${eventId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGFmODNiYmJlOWIxNTAwMTU1MDZlMTgiLCJpYXQiOjE2MjIxMTUyNTksImV4cCI6MTYyMzMyNDg1OX0.PEsg5k23MES6HUlKFUsFwhpH7JnT1QiAZe3WzAQLyJQ",
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) =>
+            console.log("The data has been successfully deleted: ", data)
+          )
+          .then((editFills) => {
+            document.getElementById("name").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("brand").value = "";
+            document.getElementById("url").value = "";
+            document.getElementById("price").value = "";
+          });
+      };
+
+      // edit data function which edits the product data and
+      // uses PUT method of the fetch API;
+
+      const editData = () => {
+        // grabbing the data to be edited;
+
+        const name = document.getElementById("name").value;
+        console.log("till name is perfect", name);
+
+        const myEvent = {
+          name,
+          description: document.getElementById("description").value,
+          brand: document.getElementById("brand").value,
+          imageUrl: document.getElementById("url").value,
+          price: document.getElementById("price").value,
+        };
+
+        console.log("Ready for the update");
+        fetch(`https://striveschool-api.herokuapp.com/api/product/${eventId}`, {
+          method: "PUT",
+          body: JSON.stringify(myEvent),
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGFmODNiYmJlOWIxNTAwMTU1MDZlMTgiLCJpYXQiOjE2MjIxMTUyNTksImV4cCI6MTYyMzMyNDg1OX0.PEsg5k23MES6HUlKFUsFwhpH7JnT1QiAZe3WzAQLyJQ",
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .then((removetext) => {
+            document.getElementById("name").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("brand").value = "";
+            document.getElementById("url").value = "";
+            document.getElementById("price").value = "";
+          });
+      };
+    </script>
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
